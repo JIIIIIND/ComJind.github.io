@@ -1,9 +1,9 @@
 # main links
 main:
   - title: "Project"
-    url: https://jiiiiind.github.io/project/
+    url: /_project/
   - title: "Learn"
-    url: https://jiiiiind.github.io/learn/
+    url: /_learn/
   # - title: "Sample Posts"
   #   url: /year-archive/
   # - title: "Sample Collections"
