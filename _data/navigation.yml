@@ -1,9 +1,9 @@
 # main links
 main:
-  - title: "Project"
-    url: /_project/
-  - title: "Learn"
-    url: /_learn/
+  - title: "About"
+    url: "/about/"
+  - title: "Category"
+    url: "/categories/"
   # - title: "Sample Posts"
   #   url: /year-archive/
   # - title: "Sample Collections"
