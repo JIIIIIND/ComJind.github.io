@@ -4,14 +4,6 @@ title: Project
 category: project
 ---
 
-this is project category
-<ul>
-		{% for post in site.categories.project %}
-		post
-		<li><a href="{{ post.url }}">{{ post.title }}</a>
-		</li>
-		{% endfor %}
-		{% for post in site.categories %}
-		post
-		{% endfor %}
-</ul>
+{% for post in site.categories.Project %}
+{% include archive-single.html type=page.entries_layout %}
+{% endfor %}
