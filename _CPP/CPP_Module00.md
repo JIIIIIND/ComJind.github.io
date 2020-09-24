@@ -1,7 +1,10 @@
 ---
 title: "CPP Module00"
 date: 2020-09-24 17:03:21 +0900
-categories: 42Seoul
+categories: 42Seoul CPP
+toc: true
+toc_sticky: true
+toc_label: "CPP Module00"
 ---
 
 ## ex00

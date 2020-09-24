@@ -4,9 +4,46 @@ main:
     url: "/about/"
   - title: "Category"
     url: "/categories/"
+  - title: "42Seoul"
+    url: "/42Seoul/"
   # - title: "Sample Posts"
   #   url: /year-archive/
   # - title: "Sample Collections"
   #   url: /collection-archive/
   # - title: "Sitemap"
   #   url: /sitemap/
+
+42Cursus:
+  - title: "0 circle"
+  - title: "1 circle"
+  - title: "2 circle"
+  - title: "3 circle"
+  - title: "4 circle"
+    children:
+      - title: "Philosopher"
+      - title: "CPP"
+        url: /CPP/CPP_Module_Guide/
+  - title: "5 circle"
+
+CPP:
+  - title: "CPP"
+    url: /CPP/CPP_Module_Guide/
+    children:
+      - title: "Module00"
+        url: /CPP/CPP_Module00/
+      - title: "Module01"
+        url: /CPP/CPP_Module01/
+      - title: "Module02"
+        url: /CPP/CPP_Module02/
+      - title: "Module03"
+        url: /CPP/CPP_Module03/
+      - title: "Module04"
+        url: /CPP/CPP_Module04/
+      - title: "Module05"
+        url: /CPP/CPP_Module05/
+      - title: "Module06"
+        url: /CPP/CPP_Module06/
+      - title: "Module07"
+        url: /CPP/CPP_Module07/
+      - title: "Module08"
+        url: /CPP/CPP_Module08/
