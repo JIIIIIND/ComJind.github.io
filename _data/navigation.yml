@@ -15,9 +15,31 @@ main:
 
 42Cursus:
   - title: "0 circle"
+    childeren:
+      - title: "Libft"
+        # url: /42Seoul/0Circle/Libft
   - title: "1 circle"
+    children:
+      - title: "ft_printf"
+        # url: /42Seoul/1Circle/ft_printf
+      - title: "get_next_line"
+        # url: /42Seoul/1Circle/get_next_line
+      - title: "netwhat"
+        # url: /42Seoul/1Circle/netwhat
   - title: "2 circle"
+    children:
+      - title: "ft_server"
+        # url: /42Seoul/2Circle/ft_server
+      - title: "cub3D"
+        # url: /42Seoul/2Circle/cub3D
   - title: "3 circle"
+    children:
+      - title: "libasm"
+        # url: /42Seoul/3Circle/libasm
+      - title: "ft_services"
+        # url: /42Seoul/3Circle/ft_services
+      - title: "minishell"
+        # url: /42Seoul/3Circle/minishell
   - title: "4 circle"
     children:
       - title: "Philosopher"
