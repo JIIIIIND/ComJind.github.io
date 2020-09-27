@@ -48,3 +48,7 @@ ex) 하위 클래스에서 구현해야 하는 함수 및 알고리즘들을 미
 - State
 - Strategy
 - Visitor
+
+## 참조
+- <https://github.com/gyoogle/tech-interview-for-developer/blob/master/Design%20Pattern/%5BDesign%20Pattern%5D%20Overview.md>
+- <https://m.blog.naver.com/PostView.nhn?blogId=jvioonpe&logNo=220227413391&proxyReferer=https:%2F%2Fwww.google.com%2F>
