@@ -31,15 +31,7 @@ layout: default
             <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> {% include read-time.html %}</p>
           {% endif %}
         </header>
-      {% endunless %}
-
-      <div style="text-align: center;">
-        <a href="http://hits.dwyl.com/{{ site.url | remove_first: 'https://' | remove_first: 'http://' }}{{ page.url }}"
-          target="_blank">
-          <img
-            src="http://hits.dwyl.com/{{ site.url | remove_first: 'https://' | remove_first: 'http://' }}{{ page.url }}.svg" />
-        </a>
-      </div>
+      {% endunless %}      
 
       <section class="page__content" itemprop="text">
         {% if page.toc %}
