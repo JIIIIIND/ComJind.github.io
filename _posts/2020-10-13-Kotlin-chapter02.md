@@ -1,5 +1,5 @@
 ---
-title: "Do It! 코틀린 프로그래밍 챕터02"
+title: "Do It! 코틀린 프로그래밍 챕터02-01"
 date: 2020-10-13 23:22:11 +0900
 categories: Kotlin
 ---
