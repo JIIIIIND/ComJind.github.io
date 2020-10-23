@@ -593,6 +593,7 @@ fun twoLambda(first: (String, String) -> String, second: (String) -> String) {
 ```
 
 마지막 인자 값에 대해서는 소괄호를 생략할 수 있습니다.
+
 ```kotlin
 ({첫 번째}, {두 번째}, ...) {마지막}
 ```
