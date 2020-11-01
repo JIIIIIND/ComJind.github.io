@@ -851,7 +851,62 @@ crossinline을 사용하면 람다식에서 return 문이 사용되었을 때 �
 
 ### 확장 함수
 
+기존 멤버 메서드는 아니지만 기존의 클래스에 내가 원하는 함수를 하나 더 포함시켜 확장하고 싶을때 사용합니다. 클래스와 같은 확장 대상에 확장 함수를 사용하기 위해 다음과 같이 정의할 수 있습니다.
+
+```kotlin
+fun 확장 대상.함수 이름(매개변수, ...): 반환값 {
+	...
+	return 값
+}
+```
+
+최상위 클래스인 Any에 확장 함수를 구현하면 모든 클래스에 확장 함수를 추가할 수 있습니다.
+
+**String 클래스에 나만의 확장 함수 추가하기**
+
+```kotlin
+package chap03.section5
+
+fun main() {
+	val source = "Hello World!"
+	val target = "Kotlin"
+	println(source.getLongString(target))
+}
+
+fun String.getLongString(target: String): String =
+	if (this.length > target.length) this else target
+```
+
 ### 중위 함수
+
+중위 표현법이란 클래스의 멤버를 호출할 때 사용하는 점을 생략하고 함수 이름 뒤에 소괄호를 붙이지 않아 직관적인 이름을 사용할 수 있는 표현법입니다.
+즉, 중위 함수란 일종의 연산자를 구현할 수 있는 함수를 말합니다.
+
+**중위 함수의 조건**
+
+* 멤버 메서드 또는 확장 함수여야 함
+* 하나의 매개변수를 가져야 함
+* infix 키워드를 사용하여 정의함
+
+기존에 자주 사용하던 자료형 클래스인 Int에 확장 함수 multiply()를 만들고 이것을 중위 표현법으로 사용하는 예제입니다.
+
+```kotlin
+package chap03.section5
+
+fun main() {
+	//일반 표현법
+	//val multi = 3.multiply(10)
+
+	//중위 표현법
+	val multi = 3 multiply 10
+	println("multi: $multi")
+}
+
+//Int를 확장해서 multiply() 함수를 하나 더 추가함
+infix fun Int.multiply(x: Int): Int { //infix로 선언되므로 중위 함수
+	return this * x
+}
+```
 
 ### 꼬리 재귀 함수
 
