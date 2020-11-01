@@ -910,4 +910,49 @@ infix fun Int.multiply(x: Int): Int { //infix로 선언되므로 중위 함수
 
 ### 꼬리 재귀 함수
 
+재귀란 자기 자신을 다시 참조하는 방법을 의미합니다. 그래서 재귀 함수는 반드시 다음 조건에 맞게 설계해야 합니다. 그렇지 않으면 스택 오버플로 오류가 발생하며 프로그램이 제대로 동작하지 않게 됩니다.
+
+**재귀 함수의 조건**
+
+* 무한 호출에 빠지지 않도록 탈출 조건을 만들어 둔다.
+* 스택 영역을 이용하므로 호출 횟수를 무리하게 많이 지정해 연산하지 않는다.
+* 코드를 복잡하지 않게 한다.
+
+코틀린에서는 꼬리 재귀 함수를 통해 스택 오버플로 현상을 해결할 수 있습니다. 이것은 스택에 계속 쌓이는 방식이 아닌 꼬리를 무는 형태로 반복합니다. 이때 코틀린 고유의 tailrec키워드를 사용해야 합니다.
+
+**factorial을 통한 예제**
+
+```kotlin
+package chap03.section5
+
+fun main() {
+	val number = 4
+	val result: Long
+
+	result = factorial(number)
+	println("Factorial: $number -> $result")
+}
+
+fun factorial(n: Int): Long {
+	return if (n == 1) n.toLong() else n * factorial(n - 1)
+}
+```
+
+위의 코드는 n이 아주 큰 값이 되는 경우 지나치게 많은 호출로 인해 스택 오버플로 오류가 발생 할 수 있습니다.
+
+```kotlin
+package chap03.section5.tailrec
+
+fun main() {
+	val number = 5
+	println("Factorial: $number -> ${factorial(number)}")
+}
+
+tailrec fun factorial(n: Int, run: Int = 1): Long {
+	return if (n == 1) run.toLong() else factorial(n - 1, run * n)
+}
+```
+
+팩토리얼 값을 그때그때 계산하므로 스택 메모리를 낭비하지 않아도 됩니다.
+
 ## 함수와 변수의 범위
