@@ -600,8 +600,259 @@ fun twoLambda(first: (String, String) -> String, second: (String) -> String) {
 
 ## 고차 함수와 람다식의 사례 알아보기
 
+### 동기화를 위한 코드 구현 구경하기
 
+동기화란 변경이 일어나면 안 되는 특정 코드를 보호하기 위한 잠금 기법을 말합니다. 동기화로 보호되는 코드는 임계 영역이라고도 부릅니다.
+
+다음은 자바에서 사용하는 Lock과 ReentrantLock의 기본적인 구성입니다.
+
+```java
+Lock lock = new Reentrantㅣock();
+lock.lock(); //잠금
+try {
+	//보호할 임계 영역의 코드
+	//수행할 작업
+} finally {
+	lock.unlock(); //해제
+}
+```
+
+이 코드를 특정 함수를 보호하기 위한 고차 함수를 만들고 활용해 봅시다.
+
+```kotlin
+fun <T> lock(reLock: ReentrantLock, body: ()->T): T {
+	reLock.lock()
+	try {
+		return body()
+	} finally {
+		reLock.unlock()
+	}
+}
+```
+
+이제 공유 자원에 접근하는 criticalFunc()라는 함수가 있다고 가정해 봅시다. 이 함수가 사용하는 공유 자원을 보호하기 위해 다음과 같이 활용할 수 있습니다.
+
+```kotlin
+package chap03.section4
+
+import java.util.concurrent.locks.ReentrantLock
+
+var sharable = 1 //보호가 필요한 공유 자원
+
+fun main() {
+	val reLock = ReentrantLock()
+
+	lock(reLock, { criticalFunc() })
+	lock(reLock, { criticalFunc() })
+	lock(reLock, ::criticalFunc)
+
+	println(sharable)
+}
+
+fun criticalFunc() {
+	//공유 자원 접근 코드 사용
+	sharable += 1
+}
+
+fun <T> lock(reLock: ReentrantLock, body: ()->T): T {
+	reLock.lock()
+	try {
+		return body()
+	} finally {
+		reLock.unlock()
+	}
+}
+```
+
+해당 예제의 표현식은 모두 동일하지만 마지막의 함수 참ㅈ도로 호출하는 방법을 사용하는 것이 좋습니다.
+
+### 네트워크 호출 구현 구경하기
+
+네트워크로부터 무언가를 호출하고 성공하거나 실패했을 때 특정 콜백 함수를 처리하는 프로그램을 만든다고 가정해 봅시다.
+
+자바에서 네트워크 전송 작업을 위해 성공과 실패에 대한 onSuccess(), onError()를 콜백 함수로 호출하는 인터페이스를 만든다고 가정합시다.
+
+```java
+public interface Callback {
+	void onSuccess(ResultType result);
+	void onError(Exception exception);
+}
+
+//networkCall 선언
+public void networkCall (Callback callback) {
+	try {
+		//성공하면 onSuccess() 콜백 함수 호출
+		callback.onSuccess(myResult);
+	} catch(e: Throwable) {
+		//실패하면 onError() 콜백 함수 호출
+		callback.onError(e);
+	}
+}
+...
+//networkCall 사용 - 인자에서 인터페이스 구현을 익명 객체를 만들어 처리
+networkCall(new Callback() {
+	public void onSuccess(ResultType result) {
+		//네트워크 호출에 성공했을 때의 구현부
+	}
+	public void onError(Exception e) {
+		//네트워크 호출에 실패했을 때의 구현부
+	}
+})
+```
+
+이제 이것을 코틀린 설계로 바꿔 봅시다.
+
+```kotlin
+//코틀린으로 만든 네트워크 호출 구현부
+// 람다식 함수의 매개변수를 가진 networkCall 함수 선언
+fun networkCall(onSuccess: (ResultType) -> Unit, onError: (Throwable) -> Unit) {
+	try {
+		onSuccess(myResult)
+	} catch (e: Throwable) {
+		onError(e)
+	}
+}
+
+...
+//networkCall()함수 사용 - 인자 형식에 람다식을 사용
+networkCall(result -> {
+	//네트워크 호출에 성공했을 때 구현부
+}, error -> {
+	//네트워크 호출에 실패했을 때 구현부
+});
+```
+
+자바에서 사용한 인터페이스나 익명 객체 없이 networkCall() 함수에서 바로 람다식 형태로 네트워크의 성공과 실패에 대한 내용을 구현할 수 있습니다.
 
 ## 코틀린의 다양한 함수 알아보기
+
+### 익명 함수
+
+익명 함수란 일반 함수이지만 이름이 없는 것입니다. 물론 람다식 함수도 이름 없이 구성할 수 있지만 이것은 일반 함수의 이름을 생략하고 사용하는 것입니다.
+
+```kotlin
+fun(x: Int, y: Int): Int = x + y //함수 이름이 생략된 익명 함수
+```
+
+이것은 변수 선언에 그대로 사용할 수 있습니다.
+
+```kotlin
+val add: (Int, Int) -> Int = fun(x, y) = x + y
+val result = add(10, 2)
+```
+
+선언 자료형을 람다식 형태로 써 주면 변수 add는 람다식 함수처럼 add()와 같이 사용할 수 있는 것이죠. 만일 매개변수에 자료형을 써 주면 선언부에 자료형은 생략할 수 있습니다.
+
+```kotlin
+val add = fun(x: Int, y: Int) = x + y
+```
+
+이것은 람다식 표현법과 매우 유사하며 다음과 같이 동일하게 만들 수 있습니다.
+
+```kotlin
+val add = { x: Int, y: Int -> x + y }
+```
+
+람다식에서는 return, break, continue처럼 제어문을 사용하기 어렵기 때문에 익명 함수를 사용합니다.
+물론 람다식으로 표현할 수 있는데도 일부러 익명 함수를 사용하면 코드가 읽기 어려우므로 적재적소에 맞게 사용할 것을 권장합니다.
+
+### 인라인 함수
+
+인라인 함수는 이 함수가 호출되는 곳에 함수 본문의 내용을 모두 복사해 넣어 함수의 분기 없이 처리되기 때문에 코드의 성능을 높일 수 있습니다.
+인라인 함수는 람다식 매개변수를 가지고 있는 함수에서 동작합니다. 보통 함수는 호출되었을 때 다른 코드로 분기해야 하기 때문에 내부적으로 기존 내용을 저장했다가 다시 돌아올 때 복구하는 작업에 프로세스와 메모리를 꽤 사용해야 하는 비용이 듭니다.
+
+```kotlin
+package chap03.section5
+
+fun main() {
+	//인라인 함수 shortFunc()의 내용이 복사되어 shortFunc으로 들어감
+	shortFunc(3) { println("First call: $it") }
+	shortFunc(5) { println("Second call: $it") }
+}
+
+inline fun shortFunc(a: Int, out: (Int) -> Unit) {
+	println("Before calling out()")
+	out(a)
+	println("After calling out()")
+}
+```
+
+**인라인 함수 제한하기**
+
+다음과 같은 인라인 함수를 살펴봅시다.
+
+```kotlin
+inline fun sub(out1: () -> Unit, out2: () -> Unit) {...}
+```
+
+위 코드의 경우 out1과 out2의 람다식이 그대로 복사되므로 코드의 양이 많아집니다. 그렇다면 일부 람다식을 인라인되지 않게 하기 위해서 어떻게 할까요? 다음과 같이 noinline 키워드를 사용하는 것입니다.
+
+```kotlin
+package chap03.section5.noinline
+
+fun main() {
+	shortFunc(3) { println("First call: $it") }
+}
+
+inline fun shortFunc(a: Int, noinline out: (Int) -> Unit) {
+	println("Before calling out()")
+	out(a)
+	println("After calling out()")
+}
+```
+
+**인라인 함수와 비지역 반환**
+
+인라인 함수에서 사용한 람다식을 빠져나오려면 어떻게 해야 할까요? 인라인 함수에서 사용한 람다식에서는 return을 사용할 수 있습니다.
+
+```kotlin
+package chap03.section5.localreturn
+
+fun main() {
+	shortFunc(3) {
+		println("First call: $it")
+		return
+	}
+}
+
+inline fun shortFunc(a: Int, out: (Int) -> Unit) {
+	println("Before calling out()")
+	out(a)
+	println("After calling out()")
+}
+```
+
+out(a)는 인라인되어 대체되기 때문에 return문까지 포함됩니다. 따라서 println("After calling out()") 문장은 실행되지 않습니다. 이러한 반환ㅇ르 비지역 반환이라고 부릅니다.
+
+만일 shortFunc()가 inline 키워드로 선언되지 않으면 return문은 람다식 본문에 사용할 수 없으므로 return문을 허용할 수 없다는 오류가 납니다. 그 밖에 out()을 직접 호출해 사용하지 않고 또 다른 함수에 중첩하면 실행 문맥이 달라지므로 return을 사용할 수 없습니다. 이때 비지역 반환을 금지하는 방법이 있습니다.
+
+```kotlin
+package chap03.section5.crossinline
+
+fun main() {
+	shortFunc(3) {
+		println("First call: $it")
+		//return 사용 불가
+	}
+}
+
+inline fun shortFunc(a: Int, crossinline out: (Int) -> Unit) {
+	println("Before calling out()")
+	nestedFunc { out(a) }
+	println("After calling out()")
+}
+
+fun nestedFunc(body: () -> Unit) {
+	body()
+}
+```
+
+crossinline을 사용하면 람다식에서 return 문이 사용되었을 때 코드 작성 단계에서 오류를 보여줘 잘못된 비지역 반환을 방지할 수 있습니다.
+
+### 확장 함수
+
+### 중위 함수
+
+### 꼬리 재귀 함수
 
 ## 함수와 변수의 범위
