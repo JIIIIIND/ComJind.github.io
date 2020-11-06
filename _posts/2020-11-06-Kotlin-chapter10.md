@@ -172,9 +172,183 @@ fun main() {
 
 2번을 보면 toString()을 사용해 it을 문자열로 변환한 후 반환된 값을 str에 할당합니다. 이때 세이프콜을 사용하지 않았습니다. 만일 score가 null이라면 str에는 null이 할당됩니다. 세이프콜을 사용하더라도 람다식을 사용하지 않게 되므로 str은 String?으로 추론되어 null이 할당됩니다.
 
+**커스텀 뷰에서 let()함수 활용하기**
+
+let() 함수를 활용하여 안드로이드의 커스텀 뷰에서 Padding(여백) 값을 지정하기 위해 다음과 같은 구문을 사용한다고 해 봅시다.
+
+```kotlin
+val padding = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP, 16f, resources.displayMetrics).toInt()
+
+setPadding(padding, 0, padding, 0) //왼쪽, 오른쪽 padding 설정
+```
+
+TypedValue.applyDimension()을 통해 얻은 값을 정수형으로 변환한 후 padding에 할당했습니다. 이때 padding이 한 번만 사용되면 변수 할당을 하느라 자원 낭비가 있을 수 있습니다. 다음과 같이 let()함수를 사용할 수 있습니다.
+
+```kotlin
+TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16f,
+        resources.displayMetrics).toInt().let { padding ->
+    setPadding(padding, 0, padding, 0) //계산된 값을 padding이라는 이름의 인자로 받음
+    }
+```
+
+여기서는 얻은 값을 let()을 통해 람다식으로 보내고 람다식의 본문 코드에서는 setPadding()함수를 호출해 얻은 값을 지정하고 있습니다. 인자가 1개밖에 없으므로 다음과 같이 it으로 간략화 할 수 있습니다.
+
+```kotlin
+TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16f,
+    resources.displayMetrics).toInt().let {
+        setPadding(it, 0, it, 0) //padding 대신 it 사용
+    }
+```
+
+**null가능성 있는 객체에서 let() 함수 활용하기**
+
+let()함수를 세이프 콜과 함께 사용하면 if (null != obj)와 같은 null 검사 부분을 대체할 수 있습니다.
+
+```kotlin
+var obj: String? //null일 수 있는 변수 obj
+...
+if (null != obj) { //obj가 null이 아닐 경우 작업 수행(기존 방식)
+    Toast.makeText(applicationContext, obj, Toast.LENGTH_LONG).show()
+}
+```
+
+이것을 다음과 같이 세이프 콜과 let() 함수를 사용해 변경합니다.
+
+```kotlin
+obj?.let {
+    Toast.makeText(applicationContext, it, Toast.LENGTH_LOONG).show()
+}
+```
+
+만일 다음과 같이 else문이 포함된 긴 문장을 변경하려면 어떻게 할까요?
+
+```kotlin
+val firstName: String?
+val lastName: String
+...
+//if문을 사용한 경우
+if (null != firstName) {
+    println("$firstName $lastName")
+} else {
+    print("$lastName")
+}
+```
+
+firstName의 변수에 다음과 같이 let()과 엘비스 연산자를 적용해 변경하면 아래와 같이 한 줄로 단순화할 수 있습니다.
+
+```kotlin
+firstName?.let { print("$it $lastName") } ?: print("$lastName")
+```
+
+**메서드 체이닝을 사용할 때 let() 함수 활용하기**
+
+메서드 체이닝이란 여러 메서드 혹인 함수를 연속적으로 호출하는 기법입니다.
+
+```kotlin
+var a = 1
+var b = 2
+
+a = a.let { it + 2 }.let {
+    val i = it + b
+    i
+}
+println(a)
+```
+
+let()함수가 유용하긴 하지만 코드의 가독성을 고려하면 너무 많이 사용하는 것은 권장하지 않습니다.
+
 ### also() 함수 활용하기
 
+also() 함수는 함수를 호출하는 객체 T를 이어지는 block에 전달하고 객체 T 자체를 반환합니다. 선언부의 let() 함수와 also() 함수의 차이점을 비교해 봅시다.
+
+```kotlin
+public inline fun <T, R> T.let(block: (T) -> R): R = block(this)
+public inline fun <T> T.also(block: (T) -> Unit): T { block(this); return this }
+```
+
+also()함수는 let() 함수와 역할이 거의 동일해 보입니다. 하지만 자세히 보면 반환하는 값이 다른데, let() 함수는 마지막으로 수행된 코드 블록의 결과를 반환하고, also() 함수는 블록 안의 코드 수행 결과와 상관 없이 T인 객체 this를 반환합니다.
+
+```kotlin
+var m = 1
+m = m.also { it + 3 }
+println(m) //원본 값 1
+```
+
+위의 코드처럼 연산 결과인 4가 할당되는 것이 아니라 it의 원래의 값 1이 다시 m에 할당됩니다.
+
+```kotlin
+package chap10.section1
+
+fun main() {
+    data class Person(var name: String, var skills : String)
+    var person = Person("Kildong", "Kotlin")
+    val a = person.let {
+        it.skills = "Android"
+        "success" //마지막 문장을 결과로 반환
+    }
+    println(person)
+    println("a: $a") //String
+    val b = person.also {
+        it.skills = "Java"
+        "success" //마지막 문장은 사용되지 않음
+    }
+    println(person)
+    println("b: $b") //person의 객체 b
+}
+```
+
+**특정 단위의 동작 분리**
+
+디렉터리를 생성하는 함수를 다음과 같이 만들었다고 가정해 봅시다.
+
+```kotlin
+fun makeDir(path: String): File {
+    val result = File(path)
+    result.kmdirs()
+    return result
+}
+```
+
+디렉터리를 만드는 makeDir() 함수에서 경로 path를 매개변수로 받습니다. 그런 다음 File()을 통해 결과를 result에 할당합니다. File 객체의 멤버 메서드 mkdirs()를 호출해 파일 경로를 생성하고 File 객체의 result는 그대로 반환합니다. 여기서 let() 함수와 also() 함수의 특징을 이요하면, 이와 같은 함수를 간단하게 개선할 수 있습니다.
+
+```kotlin
+fun makeDir(path: String) = path.let{ File(it) }.also{ it.mkdirs() }
+```
+
+체이닝 형태로 구성해 앞에서 만든 함수와 동일한 역할ㅇ르 하게 됩니다. 
+
 ### apply() 함수 활용하기
+
+계속해서 이전 함수들가 비교해 선언부를 살펴보겠습니다.
+
+```kotiln
+public inline fun <T, R> T.let(block: (T) -> R): R = block(this)
+public inline fun <T> t.also(block: (T) -> Unit): T { block(this); return this}
+public inlint fun <T> T.apply(block: T.() -> Unit): T { block(); return this}
+```
+
+apply()함수는 특정 객체를 생성하면서 함게 호출해야 하는 초기화 코드가 있는 경우 사용할 수 있습니다. apply()함수와 also()함수의 다른 점은 T.()와 같은 표현에서 람다식이 확장 함수로 처리된다는 것입니다.
+
+```kotlin
+package chap10.section1
+
+fun main() {
+    data class Person(var name: String, varskills : String)
+    var person = Person("Kildong", "Kotlin")
+        person.apply { this.skills = "Swift" } //여기서 this는 person 객체를 가리킴
+    println(person)
+
+    val returnObj = person.apply {
+        name = "Sean" //this 는 생략할 수 있음
+        skills = "Java" //this 없이 객체의 멤버에 여러 번 접근
+    }
+    println(person)
+    println(returnObj)
+}
+```
+
+apply()는 확장 함수로서 person을 this로 받아오는데 클로저를 사용하는 방식과 같습니다. 따라서 객체의 프로퍼티를 변경하면 원본 객체에 반영되고 또한 이 객체는 this로 반환됩니다.
 
 ### run() 함수 활용하기
 
