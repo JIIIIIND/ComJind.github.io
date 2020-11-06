@@ -1,0 +1,199 @@
+---
+title: "Do it! 코틀린 프로그래밍 챕터10"
+date: 2020-11-06 13:35 +0900
+---
+
+## 코틀린 표준 함수
+
+코틀린의 표준 함수는 람다식과 고차 함수를 이용해 선언되어 있습니다.
+
+### 람다식과 고차 함수 복습하기
+
+**람다식**
+
+람다식은 항상 중괄호로 묶여 있으며 중괄호 안에 매개변수는 화살표(->) 왼쪽에 배치되고 오른쪽에는 그에 따른 식을 구성합니다.
+```
+val 변수 이름: 자료형 선언 = { 매개변수[,...] -> 람다식 본문 }
+```
+
+```kotlin
+val sum: (Int, Int) -> Int = { x, y -> x + y }
+val mul = {x: Int, y: Int -> x * y }
+```
+
+sum은 익명 함수로 만들어지며 매개변수는 선언부의 자료형에 의해 (Int, Int)를 가지게 됩니다. 반환값은 Int이므로 람다식의 x + y가 반환됩니다. mul은 변수의 자료형 표기가 생략되었지만 람다식에 있는 매개변수의 Int 선언 표현에 의해 반환 자료형을 (Int, Int) -> Int로 추론할 수 있습니다.
+
+매개변수가 1개인 경우, 매개변수를 생략하고 it으로 표기할 수 있습니다.
+
+```kotlin
+val add: (Int) -> Int = { it + 1 }
+```
+
+만일 추론된 반환 자료형이 Unit이 아닌 경우에는 본문의 마지막 표현식이 반환값으로 처리됩니다.
+
+```kotlin
+val isPositive: (Int) -> Boolean = {
+    val isPositive = it > 0
+    isPositive
+}
+
+val isPositiveLabel: (Int) -> Boolean = number@ {
+    val isPositive = it > 0
+    return@number isPositive //라벨을 사용해 반환됨
+}
+```
+
+**고차 함수**
+
+고차 함수는 함수의 매개변수로 함수를 받거나 함수 자체를 반환할 수 있는 함수입니다.
+
+ ```kotlin
+ fun inc(x: Int): Int {
+     return x + 1
+ }
+
+ fun high(name: String, body: (Int) -> Int): Int {
+     println("name: $name")
+     val x = 0
+     return body(x)
+ }
+ ```
+
+ high의 두 번째 매개변수 body는 람다식 함수를 받을 수 있습니다.
+
+ 이번에는 다양한 형태의 고차 함수 표현법을 살펴봅시다.
+
+ ```kotlin
+ val result = high("Sean", { x -> inc(x + 3) }) //함수를 이용한 람다식
+
+ val result2 = high("Sean") { inc(it + 3) } //소괄호 바깥으로 빼내고 생략
+
+ val result3 = high("Kim", ::inc) //매개변수 없이 함수의 이름만 사용할 때
+
+ val result4 = high("Sean") { x -> x + 3 } //람다식 자체를 넘겨준 형태
+
+ val result5 = high("Sean") { it + 3 } //매개변수가 1개인 경우 생략
+ ```
+
+### 클로저
+
+람다식을 사용하다 보면 내부 함수에서 외부 변수를 호출하고 싶을 때가 있습니다. 클로저란 람다식으로 표현된 내부 함수에서 외부 범위에 선언된 변수에 접근할 수 있는 개념을 말합니다. 이때 람다식 안에 있는 외부 변수는 값을 유지하기 위해 람다식이 포획(capture)한 변수라고 부릅니다.
+
+기본적으로 함수 안에 정의된 변수는 지역 변수로 스택에 저장되어 있다가 함수가 끝나면 같이 사라집니다. 하지만 클로저 개념에서는 포획한 변수는 참조가 유지되어 함수가 종료되어도 사라지지 않고 함수의 변수에 접근하거나 수정할 수 있게 해 줍니다. 클로저의 조건은 다음과 같습니다.
+
+* final 변수를 포획한 경우 변수 값을 람다식과 함께 저장한다.
+* final이 아닌 변수를 포획한 경우 변수를 특정 래퍼(wrapper)로 감싸서 나중에 변경하거나 읽을 수 있게 한다. 이때 래퍼에 대한 참조를 람다식과 함께 저장한다.
+
+자바에서는 외부의 변수를 포획할 때 final만 포획할 수 있습니다. 따라서 코틀린에서 final이 아닌 변수를 사용하면 내부적으로 변환된 자바 코드에서 배열이나 클래스를 만들고 final로 지정해 사용됩니다.
+
+```kotlin
+package chap10.section1
+
+fun main() {
+    val calc = Calc()
+    var result = 0 //외부의 변수
+    calc.addNum(2, 3) { x, y -> result = x + y } //클로저
+    println(result) //값을 유지하여 5 출력
+}
+
+class Calc {
+    fun addNum(a: Int, b: Int, add: (Int, Int) -> Unit) { //람다식 add에는 반환값이 없음
+        add(a, b)
+    }
+}
+```
+
+위 코드에서 result는 var로 선언되었습니다. addNum이 호출되면 result는 자신의 유효 범위를 벗어나 삭제되어야 하지만 클로저의 개념에 의해 독립된 복사본을 가집니다. 코드에서 보는 것과 같이 result는 final로 선언되었으며 addNum()에서 세 번째 인자는 익ㅁ여 함수로 처리되어 외부의 변수 result의 값을 바꾸도록 invoke()를 호출하고 있습니다.
+
+```kotlin
+fun filteredNames(length: Int) {
+    val names = arrayListOf("Kim", "Hong", "Go", "Hwang", "Jeon")
+    val filterResult = names.filter {
+        it.length == length //바깥의 length에 접근
+    }
+    println(filterResult)
+}
+```
+
+filter는 arrayList의 멤버 메서드로 람다식을 전달받고 있습니다. 이때 length는 람다식 바깥의 변수로 인자로 입력받은 길이에 일치하는 요소 목록을 반환해 filterResult에 저장하고 출력합니다.
+클로저를 사용하면 내부의 람다식에서 외부 함수의 변수에 접근해 처리할 수 있어 효율성이 높습니다. 또 완전히 다른 함수에서 변수에 접근하는 것을 제한할 수 있습니다.
+
+### 코틀린의 표준 라이브러리
+
+**확장 함수의 람다식 접근 방법**
+
+| 함수 이름 | 람다식의 접근 방법 | 반환 방법 |
+|--|--|--|
+| T.let | it | block 결과 |
+| T.also | it | T caller (it) |
+| T.apply | this | T caller (this) |
+| T.run 또는 run | this | block 결과 |
+| with | this | Unit |
+
+위의 모든 함수가 람다식을 이용하고 있으며 접근 방법과 반환 방법의 차이로 구분됩니다.
+
+### let() 함수 활용하기
+
+let()함수는 함수를 호출하는 객체 T를 이어지는 block의 인자로 넘기고 block의 결괏값 R을 반환합니다.
+
+```kotlin
+public inline fun <T, R> T.let(block: (T) -> R): R { ...return block(this) }
+```
+
+let()함수는 제네릭의 확장 함수 형태이므로 어디든 적용할 수 있습니다. 매개변수로는 람다식 형태의 block이 있고 T를 매개변수로 받아 R을 반환합니다.
+let() 함수 역시 R을 반환하고 있습니다. 본문의 this는 T를 가리킵니다. 이 함수를 호출한 객체를 인자로 받으므로 이를 사용하여 다른 메서드를 실행하거나 연산을 수행해야 하는 경우 사용할 수 있습니다.
+
+```kotlin
+package chap10.section1
+
+fun main() {
+    val score: Int? = 32
+    // var score = null
+
+    //일반적인 null 검사
+    fun checkScore() {
+        if (score != null) {
+            println("Score: $score")
+        }
+    }
+
+    //let 함수를 사용해 null검사를 제거
+    fun checkScoreLet() {
+        score?.let { println("Score: $it") } //1번
+        val str = score.let { it.toString() } //2번
+        println(str)
+    }
+    checkScore()
+    checkScoreLet()
+}
+```
+
+1번의 checkScoreLet()을 보면 score에 멤버 메서드를 호출하듯 let함수를 사용했는데 매개변수가 람다식 하나일 때는 let({...})에서 표현이 소괄호가 생략되어 let {...}과 같이 나타날 수 있습니다. 그리고 null에 안전한 호출을 위해 세이프콜(?.)을 사용했고, 만일 score가 null일 경우 람다식 구문은 수행되지 않습니다. null이 아니라면 자기 자신의 값 score를 it으로 받아서 처리할 수 있습니다.
+
+2번을 보면 toString()을 사용해 it을 문자열로 변환한 후 반환된 값을 str에 할당합니다. 이때 세이프콜을 사용하지 않았습니다. 만일 score가 null이라면 str에는 null이 할당됩니다. 세이프콜을 사용하더라도 람다식을 사용하지 않게 되므로 str은 String?으로 추론되어 null이 할당됩니다.
+
+### also() 함수 활용하기
+
+### apply() 함수 활용하기
+
+### run() 함수 활용하기
+
+### with() 함수 활용하기
+
+### use() 함수 활용하기
+
+### 기타 함수의 활용
+
+## 람다식과 DSL
+
+### 코틀린에서 DSL사용하기
+
+### DSL을 사용한 사례
+
+## 파일 입출력
+
+### 표준 입출력의 기본 개념
+
+### 파일에 쓰기
+
+### 파일에서 읽기
