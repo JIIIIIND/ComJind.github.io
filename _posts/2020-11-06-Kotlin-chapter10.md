@@ -348,15 +348,247 @@ fun main() {
 }
 ```
 
-apply()는 확장 함수로서 person을 this로 받아오는데 클로저를 사용하는 방식과 같습니다. 따라서 객체의 프로퍼티를 변경하면 원본 객체에 반영되고 또한 이 객체는 this로 반환됩니다.
+apply()는 확장 함수로서 person을 this로 받아오는데 클로저를 사용하는 방식과 같습니다. 따라서 객체의 프로퍼티를 변경하면 원본 객체에 반영되고 또한 이 객체는 this로 반환됩니다. this.name = "Sean"과 같은 표현은 this가 생략 가능하기 때문에 name = "Sean"과 같이 작성할 수 있습니다. 이때 this로부터 반환된 객체를 returnObj에 할당하고 있습니다.
+
+also함수와는 객체를 넘겨받는 방법이 다릅니다. also()함수에서는 it를 사용해 멤버에 접근합니다. 위 코드에서 person객체의 skills에 접근하는 방법을 보면 차이를 바로 알 수 있습니다.
+
+```kotlin
+person.also { it.skills = "Java" } //it으로 받고 생략할 수 없음
+person.apply { skills = "Swift" } //this로 받고 생략
+```
+
+also()함수에서는 it을 생략할 수 없지만 apply() 함수에서는 this가 생략되어 멤버 이름만 사용하고 있습니다. 이것을 활용하면 특정 객체를 초기화하는 데 아주 유용합니다.
+
+**레이아웃을 초기화할 때 apply() 함수 활용하기**
+
+안드로이드에서 사용하는 레이아웃을 초기화할 때 일반적으로 다음과 같이 새로운 layoutParams 객체를 생성하고 속성을 지정합니다.
+
+```kotlin
+val param = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT)
+param.gravity = Gravity.CENTER_HORIZONTAL
+param.weight = 1f
+param.topMargin = 100
+param.bottomMargin = 100
+```
+
+위 코드에서는 LinearLayout을 초기화하기 위해 생성된 변수에 일일이 멤버를 호출해 값을 지정하고 있습니다. 여기에 apply()함수를 적용하면 다음과 같이 변경할 수 있습니다.
+
+```kotlin
+val param = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+    gravity = Gravity.CENTER_HORIZONTAL
+    weight = 1f //param을 사용하지 않고 직접 값을 지정할 수 있음
+    topMargin = 100
+    bottomMargin = 100
+}
+```
+
+apply() 함수를 사용해 param의 각 멤버를 초기화하고 이것을 그대로 반환해 param에 할당할 수 있게 됩니다. 간략하고 훨씬 보기 좋은 코드가 되었습니다.
+
+**디렉터리를 생성할 때 apply()함수 활용하기**
+
+앞에서 본 디렉터리 생성 예제를 apply()에서도 사용할 수 있습니다. 다음은 기존의 디렉터리 생성 함수입니다.
+
+```kotlin
+fun makeDir(path: String): File {
+    val result = File(path)
+    result.mkdirs()
+    return result
+}
+```
+
+사실 이런 함수를 설계할 필요 없이 apply()함수를 사용하면 다음 한 줄로 같은 효과를 볼 수 있습니다.
+
+```kotlin
+File(path).apply { mkdirs() }
+```
+
+File(path)에 의해 생성된 결과를 람다식에서 this로 받습니다. File 객체의 mkdirs()를 호출해 파일 경로를 생성한 후 결과가 아닌 객체 this를 받습니다.
 
 ### run() 함수 활용하기
 
+run() 함수는 인자가 없는 익명 함수처럼 동작하는 형태와 객체에서 호출하는 형태, 2가지로 사용할 수 있습니다. 객체 없이 run()함수를 사용하면 인자 없는 익명 함수처럼 사용할 수 있죠.
+
+```kotlin
+public inline fun <R> run(block: () -> R): R = return block()
+public inline fun <T, R> T.run(block: T.() -> R): R = return block()
+```
+
+이번에는 block이 독립적으로 사용됩니다. 이어지는 block 내에서 처리할 작업을 넣어 줄 수 있으며, 일반 함수와 마찬가지로 값을 반환하지 않거나 특정 값을 반환할 수도 있습니다. 간단한 사용 예를 봅시다.
+
+```kotlin
+var skills = "Kotlin"
+println(skills) //Kotlin
+
+val a = 10
+skills = run {
+    val level = "Kotlin Level:" + a
+    level //마지막 표현식이 반환됨
+}
+println(skills) //Kotlin Level: 10
+```
+
+run() 함수의 block이 독립적으로 사용되어 마지막 표현식을 반환했습니다. 이번엔 apply()함수와 비교해 봅시다.
+
+```kotlin
+package chap10.section1
+
+fun main() {
+    data class Person(var name: String, var skills : String)
+    var person = Person("Kildong", "Kotlin")
+    val returnObj = person.apply {
+        this.name = "Sean"
+        this.skills = "Java"
+        "success" //사용되지 않음
+    }
+    println(person)
+    println("returnObj: $returnObj")
+    val returnObj2 = person.run {
+        this.name = "Dooly"
+        this.skills = "C#"
+        "success"
+    }
+    println(person)
+    println("returnObj2: $returnObj2")
+}
+```
+
+run()함수와 apply()함수의 차이점을 보면 run()함수도 해당 객체를 this로 받아 변경할 수 있지만 apply() 함수는 this에 해당하는 객체를 반환한 반면에, run()함수는 마지막 표현식 "success"를 반환했음을 알 수 있습니다. 물론 마지막 표현식을 구성하지 않으면 Unit이 반환됩니다.
+
 ### with() 함수 활용하기
+
+with() 함수는 인자로 받는 객체를 이어지는 block의 receiver로 전달하며 결괏값을 반환합니다. with() 함수는 run()함수와 기능이 거의 동일한데, run() 함수의 경우 receiver가 없지만 with() 함수에서는 receiver로 전달할 객체를 처리하므로 객체의 위치가 달라집니다.
+
+```kotlin
+public inline fun <T, R> with(receiver: T. block: T.() -> R): R = receiver.block()
+```
+
+with() 함수는 매개변수가 2개이므로 with() {...}와 같은 형태로 넣어 줍니다. 함수 선언에서 보여주듯 with()는 확장 함수 형태가 아니고 단독으로 사용되는 함수입니다. with()함수는 세이프 콜(?.)을 지원하지 ㅇ낳기 때문에 다음의 let()함수와 같이 사용되기도 합니다.
+
+```kotlin
+val result = with (user) {
+    skills = "Java"
+    email = "kildong@example.com"
+    "success" //마지막 표현식 반환
+}
+```
+
+이 경우에 result는 "success"를 할당하는 String형의 변수가 됩니다.
 
 ### use() 함수 활용하기
 
+보통 특정 객체가 사용된 후 닫아야 하는 경우가 생기는데 이때 use() 함수를 사용하면 객체를 사용한 후 close() 함수를 자동적으로 호출해 닫아 줄 수 있습니다. 내부 구현을 보면 예외 오류 발생 여부와 상관 없이 항상 close()를 호출을 보장합니다. 선언부를 확인해 봅시다.
+
+```kotlin
+public inline fun <T: Closeable?, R> T.use(block: (T) -> R): R
+```
+
+먼저 T의 제한된 자료형을 보면 Closeable?로 block은 닫힐 수 있는 객체를 지정해야 합니다. 예를 들면 파일 객체의 경우에 사용하고 나서 닫아야 하는 대표적인 Closeable 객체가 됩니다.
+
+```kotlin
+package chap10.section1
+
+import java.io.File
+import java.io.FileOutputStream
+import java.io.PrintWriter
+
+fun main() {
+    PrintWriter(FileOutputStream("d:\\test\\output.txt")).use {
+        it.println("hello")
+    }
+}
+```
+
+PrintWriter()는 파일 등에 내용을 출력합니다. 이때 인자로 FileOutputStream()을 사용해 파일 output.txt를 지정하고 있습니다. 따라서 output.txt에 hello를 출력하고 use()에 의해 내부적으로 파일을 닫게 됩니다.
+
+다음은 output.txt파일에 "hello"라는 문자열을 저장하는 소스 코드입니다. 일반적으로 파일 작업을 하고 나면 close()를 명시적으로 호출해야 하는데, use 블록 안에서는 그럴 필요가 없습니다. 물론 파일에서 읽어들일 때도 사용할 수 있습니다. 먼저 d:\test\contents.txt에 파일을 생성하고 "Hello World"문자열을 작성해 둡니다. 이제 use() 함수를 사용해 다음과 같이 읽을 수 있습니다.
+
+```kotlin
+val file = File("d:\\test\\contents.txt")
+file.bufferedReader().use {
+    println(it.readText())
+}
+```
+
 ### 기타 함수의 활용
+
+
+**takeIf() 함수와 takeUnless() 함수의 활용**
+
+takeIf() 함수는 람다식이 true이면 결과를 반환하고, takeUnless() 함수는 람다식이 false이면 결과를 반환합니다.
+
+```kotlin
+public inline fun <T> T.takeIf(predicate: (T) -> Boolean): T?
+    = (predicate(this)) this else null
+```
+
+takeIf()함수의 정의에서 볼 수 있듯이 predicate는 T 객체를 매개변수로서 받아오고, true이면 this를 반환하고 아니면 null을 반환합니다. takeUnless() 함수는 !predicate()가 사용되어 false일 때 반환됩니다.
+
+```kotlin
+//기존 코드
+if (someObject != null && someObject.status) {
+    doThis()
+}
+//개선한 코드
+if (someObject?.status == true) {
+    doThis()
+}
+//takeIf()함수를 사용해 개선한 코드
+someObject?.takeIf { it.status }?.apply { doThis() }
+```
+
+null검사와 someObject 객체의 status의 상태를 검사해 true인 경우에 apply()를 적용해 doThis()를 호출합니다.
+다음과 같이 엘비스 연산자(?:)를 함께 사용해 처리할 수도 있습니다.
+
+```kotlin
+val input = "Kotlin"
+val keyword = "in"
+
+//입력 문자열에 키워드가 있으면 인덱스를 반환하는 함수를 takeIf() 함수를 사용하여 구현
+input.indexOf(keyword).takeIf { it >= 0 } ?: error("keyword not found")
+
+//takeUnless()함수를 사용하여 구현
+input.indexOf(keyword).takeUnless { it < 0 } ?: error("keyword not found")
+```
+
+**시간의 측정**
+
+코틀린에는 람다식을 사용하는 시간 측정 함수를 표준 라이브러리에서도 제공합니다. 코틀린 kotlin.system 패키지에 있는 2개의 측정 함수 measureTimeMillis()와 measureNanoTime()을 사용할 수 있습니다. 표준 라이브러리의 Timing.kt에 보면 두 함수는 다음과 같이 선언되어 있습니다.
+
+```kotlin
+public inline fun measureTimeMillis(block: () -> Unit): Long {
+    val start = System.currentTimeMillis()
+    block()
+    return System.currentTimeMillis() - start
+}
+
+public inline fun measureNanoTime(block: () -> Unit): Long {
+    val start = System.nanoTime()
+    block()
+    return System.nanoTime() - start
+}
+```
+
+표준 라이브러리 Timing.kt 파일의 코드를 보면 밀리초와 나노초를 측정하는 함수 2개가 람다식으로 작성되어 block코드의 내용을 측정할 수 있습니다.
+
+```kotlin
+val executionTime = measureTimeMillis {
+    //측정할 코드
+}
+println("Execution Time = $executionTime ms")
+```
+
+측정하려는 코드를 measureMillis()함수의 본문에 작성하면 측정 시간을 Long형 값으로 얻을 수 있습니다. 함수의 성능을 평가할 때 유용합니다.
+
+**난수 생성하기**
+
+난수를 생성하려면 자바의 java.util.Random을 사용할 수도 있었지만 JVM에만 특화된 나수를 생성하기 때문에 코틀린에서는 멀티 플랫폼에서도 사용 가능한 kotlin.random.Random패키지를 제공합니다. 다음 소스 코드의 number는 0부터 21사이의 난수를 제공합니다.
+
+```kotlin
+import kotlin.random.Random
+
+val number = Random.nextInt(21) //숫자는 난수 발생 범위
+println(number)
+```
 
 ## 람다식과 DSL
 
