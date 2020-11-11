@@ -465,6 +465,28 @@ public inline fun <T, R> with(receiver: T, block: T.() -> R): R = receiver.block
 with() 함수는 매개변수가 2개이므로 with() {...}와 같은 형태로 넣어 줍니다. 함수 선언에서 보여주듯 with()는 확장 함수 형태가 아니고 단독으로 사용되는 함수입니다. with()함수는 세이프 콜(?.)을 지원하지 않기 때문에 다음의 let()함수와 같이 사용되기도 합니다.
 
 ```kotlin
+supportActionBar?.let {
+    with(it) {
+        setDisplayHomeAsUpEnabled(true)
+        setHomeAsUpIndicator(R.drawable.ic_clear_white)
+    }
+}
+```
+
+위 코드에서는 let() 함수로 null 검사를 하고 넘겨진 객체를 with() 함수에 의해 it으로 받아서 처리하고 있습니다. run() 함수에서 객체는 this를 받아서 생략할 수 있었듯이 with() 함수의 본문에서 it으로 받았습니다.
+
+let() 함수의 표현과 with() 함수의 표현을 병합하면 run() 함수로 다음과 같이 표현할 수 있습니다.
+
+```kotlin
+supportActionBar?.run {
+    setDisplayHomeAsUpEnabled(true)
+    setHomeAsUpIndicator(R.drawable.ic_clear_white)
+}
+```
+
+물론 null이 아닌 경우가 확실하다면 with() 함수만 사용해도 됩니다.
+
+```kotlin
 val result = with (user) {
     skills = "Java"
     email = "kildong@example.com"
