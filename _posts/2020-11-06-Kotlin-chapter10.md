@@ -322,7 +322,7 @@ fun makeDir(path: String) = path.let{ File(it) }.also{ it.mkdirs() }
 
 계속해서 이전 함수들가 비교해 선언부를 살펴보겠습니다.
 
-```kotiln
+```kotlin
 public inline fun <T, R> T.let(block: (T) -> R): R = block(this)
 public inline fun <T> t.also(block: (T) -> Unit): T { block(this); return this}
 public inlint fun <T> T.apply(block: T.() -> Unit): T { block(); return this}
@@ -462,7 +462,7 @@ with() 함수는 인자로 받는 객체를 이어지는 block의 receiver로 �
 public inline fun <T, R> with(receiver: T. block: T.() -> R): R = receiver.block()
 ```
 
-with() 함수는 매개변수가 2개이므로 with() {...}와 같은 형태로 넣어 줍니다. 함수 선언에서 보여주듯 with()는 확장 함수 형태가 아니고 단독으로 사용되는 함수입니다. with()함수는 세이프 콜(?.)을 지원하지 ㅇ낳기 때문에 다음의 let()함수와 같이 사용되기도 합니다.
+with() 함수는 매개변수가 2개이므로 with() {...}와 같은 형태로 넣어 줍니다. 함수 선언에서 보여주듯 with()는 확장 함수 형태가 아니고 단독으로 사용되는 함수입니다. with()함수는 세이프 콜(?.)을 지원하지 않기 때문에 다음의 let()함수와 같이 사용되기도 합니다.
 
 ```kotlin
 val result = with (user) {
@@ -581,7 +581,7 @@ println("Execution Time = $executionTime ms")
 
 **난수 생성하기**
 
-난수를 생성하려면 자바의 java.util.Random을 사용할 수도 있었지만 JVM에만 특화된 나수를 생성하기 때문에 코틀린에서는 멀티 플랫폼에서도 사용 가능한 kotlin.random.Random패키지를 제공합니다. 다음 소스 코드의 number는 0부터 21사이의 난수를 제공합니다.
+난수를 생성하려면 자바의 java.util.Random을 사용할 수도 있었지만 JVM에만 특화된 난ㅍ수를 생성하기 때문에 코틀린에서는 멀티 플랫폼에서도 사용 가능한 kotlin.random.Random패키지를 제공합니다. 다음 소스 코드의 number는 0부터 21사이의 난수를 제공합니다.
 
 ```kotlin
 import kotlin.random.Random
