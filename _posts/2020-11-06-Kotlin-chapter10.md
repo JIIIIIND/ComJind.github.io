@@ -320,12 +320,12 @@ fun makeDir(path: String) = path.let{ File(it) }.also{ it.mkdirs() }
 
 ### apply() 함수 활용하기
 
-계속해서 이전 함수들가 비교해 선언부를 살펴보겠습니다.
+계속해서 이전 함수들과 비교해 선언부를 살펴보겠습니다.
 
 ```kotlin
 public inline fun <T, R> T.let(block: (T) -> R): R = block(this)
 public inline fun <T> t.also(block: (T) -> Unit): T { block(this); return this}
-public inlint fun <T> T.apply(block: T.() -> Unit): T { block(); return this}
+public inline fun <T> T.apply(block: T.() -> Unit): T { block(); return this}
 ```
 
 apply()함수는 특정 객체를 생성하면서 함게 호출해야 하는 초기화 코드가 있는 경우 사용할 수 있습니다. apply()함수와 also()함수의 다른 점은 T.()와 같은 표현에서 람다식이 확장 함수로 처리된다는 것입니다.
