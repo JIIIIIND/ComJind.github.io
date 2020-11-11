@@ -316,7 +316,7 @@ fun makeDir(path: String): File {
 fun makeDir(path: String) = path.let{ File(it) }.also{ it.mkdirs() }
 ```
 
-체이닝 형태로 구성해 앞에서 만든 함수와 동일한 역할ㅇ르 하게 됩니다. 
+체이닝 형태로 구성해 앞에서 만든 함수와 동일한 역할을 하게 됩니다.
 
 ### apply() 함수 활용하기
 
@@ -459,7 +459,7 @@ run()함수와 apply()함수의 차이점을 보면 run()함수도 해당 객체
 with() 함수는 인자로 받는 객체를 이어지는 block의 receiver로 전달하며 결괏값을 반환합니다. with() 함수는 run()함수와 기능이 거의 동일한데, run() 함수의 경우 receiver가 없지만 with() 함수에서는 receiver로 전달할 객체를 처리하므로 객체의 위치가 달라집니다.
 
 ```kotlin
-public inline fun <T, R> with(receiver: T. block: T.() -> R): R = receiver.block()
+public inline fun <T, R> with(receiver: T, block: T.() -> R): R = receiver.block()
 ```
 
 with() 함수는 매개변수가 2개이므로 with() {...}와 같은 형태로 넣어 줍니다. 함수 선언에서 보여주듯 with()는 확장 함수 형태가 아니고 단독으로 사용되는 함수입니다. with()함수는 세이프 콜(?.)을 지원하지 않기 때문에 다음의 let()함수와 같이 사용되기도 합니다.
@@ -581,7 +581,7 @@ println("Execution Time = $executionTime ms")
 
 **난수 생성하기**
 
-난수를 생성하려면 자바의 java.util.Random을 사용할 수도 있었지만 JVM에만 특화된 난ㅍ수를 생성하기 때문에 코틀린에서는 멀티 플랫폼에서도 사용 가능한 kotlin.random.Random패키지를 제공합니다. 다음 소스 코드의 number는 0부터 21사이의 난수를 제공합니다.
+난수를 생성하려면 자바의 java.util.Random을 사용할 수도 있었지만 JVM에만 특화된 난수를 생성하기 때문에 코틀린에서는 멀티 플랫폼에서도 사용 가능한 kotlin.random.Random패키지를 제공합니다. 다음 소스 코드의 number는 0부터 21사이의 난수를 제공합니다.
 
 ```kotlin
 import kotlin.random.Random
