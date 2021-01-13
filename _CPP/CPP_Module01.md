@@ -264,9 +264,95 @@ void changeN(const int &ref)
 
 const를 어떤 방식으로 사용하는지 익힐 수 있습니다.
 
+### 함수 내부에서 const형을 다루려고 하는 경우
+
 ```const std::string identify(void) const;```
 와 같은 함수의 경우, 해당 메서드 내부에서는 어떠한 변수도 바꿀 수 없고, const가 아닌 메서드를 부를 수 없게 됩니다.
+함수 뒤에 붙은 const 키워드의 경우 내부에서 어떤 변수도 바꿀 수 없음을 뜻합니다.
+함수가 클래스의 멤버인 경우에만 const 키워드를 붙일 수 있으며, 해당 함수가 속한 객체의 멤버 변수를 변경할 수 없습니다.
 
+### 상수를 가리키는 포인터
+
+상수 변수에 대한 포인터를 선언하는 경우로, 자료형의 앞에 const 키워드가 붙습니다.
+
+```cpp
+const int value = 5;
+const int *ptr = &value; //true
+*ptr = 6; //false, can't change const value
+```
+
+다음과 같이 사용할 수 도 있습니다.
+
+```cpp
+int value = 5;
+const int *ptr = &value;
+```
+
+상수 변수에 대한 포인터는 상수가 아닌 변수를 가리킬 수 있습니다. 포인터를 통해 접근할 때 변수를 상수로 취급하게 됩니다.
+따라서 다음과 같은 동작은 가능합니다.
+
+```cpp
+int value = 5;
+const int *ptr = &value;
+value = 6;
+```
+
+하지만 다음과 같은 동작은 불가능합니다.
+
+```cpp
+int value = 5;
+const int *ptr = &value;
+*ptr = 6;
+```
+
+상수를 가리키는 포인터는 상수를 가리킬 뿐, 상수 자체가 아니기 때문에 다른 대상을 가리키도록 재할당할 수 있습니다.
+
+```cpp
+int value1 = 5;
+const int *ptr = &value1;
+
+int value2 = 6;
+ptr = &value2;
+```
+
+상수를 가리키는 포인터는 주로 함수가 전달된 인수를 실수로 변경하지 않기 위해 매개 변수에서 사용됩니다.
+
+### 상수 포인터
+
+포인터 자체가 상수입니다. 상수 포인터는 초기화 후에 가리키는 주소를 변경할 수 없습니다.
+자료형 뒤에 const 키워드를 사용하여 선언합니다.
+
+```cpp
+int value = 5;
+int *const ptr = &value;
+```
+
+일반 상수 변수와 마찬가지로 상수 포인턴느 선언 시 초기화해야 합니다. 즉, 상수 포인터는 항상 같은 주소를 가리킵니다.
+
+```cpp
+int value1 = 5;
+int value2 = 6;
+
+int *const ptr = &value1;
+ptr = &value2; // false, const pointer can't change
+```
+
+포인터가 상수일 뿐이지, 가리키는 변수는 상수가 아니므로 포인터를 역참조해서 값을 변경하는 것은 가능합니다.
+
+```cpp
+int value = 5;
+int *const ptr = &value;
+*ptr = 6;
+```
+
+### 상수를 가리키는 상수 포인터
+
+자료형 앞뒤로 const를 붙이면 됩니다. 다른 주소를 가리키도록 수정할 수도 없고, 역참조를 통해 값을 수정할 수도 없습니다.
+
+```cpp
+int value = 5;
+const int *const ptr = &value;
+```
 
 ## ex06
 
