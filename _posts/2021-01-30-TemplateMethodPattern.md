@@ -1,5 +1,5 @@
 ---
-title: "title"
+title: "TemplateMethod Pattern"
 date: 2021-01-30 23:08:29 +0900
 ---
 
