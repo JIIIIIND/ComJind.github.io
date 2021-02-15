@@ -92,7 +92,7 @@ sys/socket.h를 포함해야 합니다.
 
 ### int getsockname(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 
-sys.socket.h를 포함해야 합니다.
+sys/socket.h를 포함해야 합니다.
 
 소켓 디스크립터에 할당된 자신의 주소를 얻습니다.
 sockaddr 구조체는 socket생성 시에 설정한 Address family의 값에 따라 구조체의 구조가 다르므로 Address Family에 맞는 구조체를 선언하여 사용해야 합니다.
