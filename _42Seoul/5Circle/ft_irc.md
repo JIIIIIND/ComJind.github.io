@@ -401,7 +401,7 @@ long 형 네트워크 바이트 순서 데이터를 호스트 바이트 순서 �
 - 다음 RFC를 따릅니다.
 	- RFC 1459 <https://tools.ietf.org/html/rfc1459> IRC Protocol
 	- RFC 2810 <https://tools.ietf.org/html/rfc2810> [IRC Architecture]({{ "/42Seoul/5Circle/RFC2810" }})
-	- RFC 2811 <https://tools.ietf.org/html/rfc2811> IRC Channel Management
+	- RFC 2811 <https://tools.ietf.org/html/rfc2811> [IRC Channel Management]({{ "/42Seoul/5Circle/RFC2811" }})
 	- RFC 2812 <https://tools.ietf.org/html/rfc2812> IRC Client Protocol
 	- RFC 2813 <https://tools.ietf.org/html/rfc2813> IRC Server Protocol
 	- RFC 7194 <https://tools.ietf.org/html/rfc7194> IRC TLS/SSL
