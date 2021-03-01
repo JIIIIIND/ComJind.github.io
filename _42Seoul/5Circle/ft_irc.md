@@ -368,11 +368,43 @@ short 형 네트워크 바이트 순서 데이터를 호스트 바이트 순서 
 
 long 형 네트워크 바이트 순서 데이터를 호스트 바이트 순서 데이터 값으로 구합니다.
 
-### inet_addr
+### unsigned long int inet_addr(const char *cp)
 
-### inet_ntoa
+sys/socket.h, netinet/in.h, arpa/inet.h가 필요합니다.
 
-### send
+숫자와 점으로 이루어진 IP 문자열을 long 형의 숫자 IP주소로 바꾸어 줍니다.
+struct sockaddr_in에서 .sin_addr.s_add 값을 long형의 숫자 IP 값을 넣어 주어야 하는데 이 때 사용됩니다.
+
+실패 시 -1이 반환됩니다.
+
+### char *inet_ntoa(struct in_addr in)
+
+network byte order의 주소를 a.b.c.d 형태인 IPv4 주소 형태의 문자열로 반환합니다.
+struct in_addr은 AF_INET Address family 주소 체계에 포함된 구조입니다.
+accept, getpeername, getsockname 등으로 얻은 주소 정보입니다.
+
+숫자 점 표기법의 IP주소를 반환합니다.
+
+### ssize_t send(int sockfd, const void *buf, size_t len, int flags)
+
+- sockfd
+	- connect, accept로 연결된 socket descriptor
+- buf
+	- 전송할 데이터
+- len
+	- 전송할 데이터 길이
+- flags
+	- 전송할 데이터 또는 읽는 방법에 대한 option. 0 또는 bit or 연산으로 설정 가능
+	- MSG_DONTROUTE
+		- gateway를 통하지 않고 직접 상대 시스템으로 전송
+	- MSG_DONTWAIT
+		- non blocking에서 사용하는 옵션으로 전송이 block되면 EAGIN, EWOULDBLOCK 오류로 바로 return함
+	- MSG_MORE
+		- 더 전송할 데이터가 있음을 설정함
+	- MSG_OOB
+		- out of band 데이터를 읽습니다. 주로 X.25에서 접속이 끊겼을 때에 전송되는 데이터 flags 값이 0이면 일반 데이터를 전송하며, write를 호출한 것과 같습니다.
+
+
 
 ### recv
 
