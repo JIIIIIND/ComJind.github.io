@@ -435,7 +435,7 @@ accept, getpeername, getsockname 등으로 얻은 주소 정보입니다.
 	- RFC 2810 <https://tools.ietf.org/html/rfc2810> [IRC Architecture]({{ "/42Seoul/5Circle/RFC2810" }})
 	- RFC 2811 <https://tools.ietf.org/html/rfc2811> [IRC Channel Management]({{ "/42Seoul/5Circle/RFC2811" }})
 	- RFC 2812 <https://tools.ietf.org/html/rfc2812> [IRC Client Protocol]({{ "/42Seoul/5Circle/RFC2812" }})
-	- RFC 2813 <https://tools.ietf.org/html/rfc2813> IRC Server Protocol
+	- RFC 2813 <https://tools.ietf.org/html/rfc2813> [IRC Server Protocol]({{ "/42Seoul/5Circle/RFC2813" }})
 	- RFC 7194 <https://tools.ietf.org/html/rfc7194> IRC TLS/SSL
 - client를 구현 할 필요는 없습니다.(보너스 파트)
 - 서버간 통신을 처리해야 합니다.
