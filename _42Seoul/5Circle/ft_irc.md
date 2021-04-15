@@ -75,7 +75,7 @@ Global에는 해당 ircd에 대한 전반적인 정보가 담겨 있습니다.
 
 Name은 말 그대로 현재 ircd의 서버 이름을 나타냅니다. 서버를 특정하기 때문에 고유한 이름을 사용해야 하고, RFC에 정의된 규칙에 따라 작성합니다.
 
-AdminInfo1, 2, Email은 INFO 명령어의 Reply에 사용됩니다.
+AdminInfo1, 2, Email은 ADMIN 명령어의 Reply에 사용됩니다.
 Info는 서버 간 연결에서 해당 서버를 소개하기 위한 문구입니다.
 MotdFile은 Message Of The Day 파일을 나타내고, 클라이언트가 접속할 때 나타낼 파일입니다. 아스키 아트를 넣어도 되고 적당히 하고 싶은 말을 넣어도 됩니다.
 
