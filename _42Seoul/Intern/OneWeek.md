@@ -14,55 +14,6 @@ categories: 42Seoul
 샘플 코드는 건네받았지만, 각 데이터들이 어떤 정보를 의미하는지 몰랐기에 NFC의 각 태그 종류와 NFC를 통한 메시지 전송 등에 대한 이론적인 부분을 살펴봤습니다.
 다음으론 안드로이드에서 NFC 태그를 인식할 수 있도록 구현을 했습니다.
 
-```kotlin
-class NFCHandler(activity: Activity) {
-    private val TAG = "NFC_HANDLER"
-    private var activity : Activity? = activity
-    private var nfcAdapter : NfcAdapter? = null
-    private var tag : Tag? = null
-
-    init {
-        nfcAdapter = NfcAdapter.getDefaultAdapter(this.activity)
-        if (this.nfcAdapter == null)
-            Toast.makeText(activity, "NFC를 지원하지 않습니다.", Toast.LENGTH_SHORT).show()
-    }
-
-    fun activateNfcController() : Unit {
-        if (this.nfcAdapter != null && this.activity != null) {
-            val targetIntent = Intent(this.activity, this.activity!!::class.java)
-            targetIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-            //pending
-            val pendingIntent = PendingIntent.getActivities(this.activity, 0, arrayOf(targetIntent), 0)
-            //intentFilter
-            val intentFilter : Array<IntentFilter>? = arrayOf(IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED))
-            val techLists = arrayOf(
-                arrayOf(NfcA::class.java.name),
-                arrayOf(NfcF::class.java.name),
-                arrayOf(NfcV::class.java.name),
-                arrayOf(NfcB::class.java.name))
-            //techLists
-            nfcAdapter!!.enableForegroundDispatch(this.activity, pendingIntent, intentFilter, techLists)
-        }
-    }
-
-    fun deActivateNfcAdapter() {
-        if (this.nfcAdapter != null)
-            this.nfcAdapter!!.disableForegroundDispatch(this.activity)
-    }
-
-    fun getTag(intent : Intent) : Tag? {
-        this.tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
-        if (this.tag == null) {
-            Toast.makeText(this.activity, "NFC Tag 실패", Toast.LENGTH_SHORT).show()
-            return null
-        }
-        Toast.makeText(this.activity, "NFC Tag 성공", Toast.LENGTH_SHORT).show()
-        return this.tag
-    }
-	...
-}
-```
-
 NFCHandler에서 activateNfcController 메서드를 통해 어떤 종류의 NFC를 감지할 것인지 정해주고, foreground에서 동작하도록 합니다.
 예를 들어 techLists에서 NfcV를 제외한다면 해당 타입의 NFC태그는 기기가 인식하지 못합니다.
 
